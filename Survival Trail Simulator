@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <vector>
 #include <string>
 #include <cstdlib>
 #include <ctime>
@@ -15,9 +16,9 @@ private:
     int distance;
     int money;
     bool hasTent;
+    static int total_players;
 
-    string inventory[10];
-    int itemCount;
+    vector<string> inventory;
     int sticksFound;
 
 public:
@@ -29,7 +30,10 @@ public:
         hasTent = false;
         itemCount = 0;
         sticksFound = 0;
+        total_players ++;
     }
+
+        ~Player(){ total_players--; }
 
     void updateStats(int h, int f, int d) {
         health += h;
@@ -57,49 +61,41 @@ public:
         return hasTent;
     }
 
-    int getHealth() { return health; }
-    int getFood() { return food; }
-    int getDistance() { return distance; }
-    int getMoney() { return money; }
-    int getStickCount() { return sticksFound; }
+    int getHealth() const { return health; }
+    int getFood() const { return food; }
+    int getDistance() const { return distance; }
+    int getMoney() const { return money; }
+    int getStickCount() const { return sticksFound; }
 
     // ================= INVENTORY =================
 
-    void addItem(string item) {
-        if (itemCount < 10) {
-            inventory[itemCount] = item;
-            itemCount++;
-            cout << item << " added to inventory.\n";
-        } else {
-            cout << "Inventory full!\n";
-        }
+  void addItem(const string& item) {
+    if (inventory.size() < 10) {
+        inventory.push_back(item);
+        cout << item << " added to inventory.\n";
+    } else {
+        cout << "Inventory full!\n";
     }
+}
 
-    void showInventory() {
-        cout << "\n Inventory:\n";
-
-        if (itemCount == 0) {
-            cout << "Empty\n";
-            return;
-        }
-
-        for (int i = 0; i < itemCount; i++) {
-            cout << i + 1 << ". " << inventory[i] << endl;
-        }
+void showInventory() const {
+    cout << "\n Inventory:\n";
+    if (inventory.empty()) {
+        cout << "Empty\n";
+        return;
     }
-
-    void useItem(int index) {
-        if (index < 0 || index >= itemCount) {
-            cout << "Invalid item!\n";
-            return;
-        }
-
-        for (int i = index; i < itemCount - 1; i++) {
-            inventory[i] = inventory[i + 1];
-        }
-
-        itemCount--;
+    for (size_t i = 0; i < inventory.size(); ++i) {
+        cout << i + 1 << ". " << inventory[i] << endl;
     }
+}
+
+void useItem(int index) {
+    if (index < 0 || (size_t)index >= inventory.size()) {
+        cout << "Invalid item!\n";
+        return;
+    }
+    inventory.erase(inventory.begin() + index);
+}
 
     // ================= STICK SYSTEM =================
 
@@ -155,29 +151,31 @@ public:
         cout << "Tent: " << (hasTent ? "Yes" : "No") << endl;
     }
 
-        void saveToFile(const std::string& filename) {
+    void saveToFile(const std::string& filename) const {
     std::ofstream fout(filename);
-    fout << health << " " << food << " " << distance << " " << money << " " << hasTent << " " << sticksFound << " " << itemCount << "\n";
-    for (int i = 0; i < itemCount; i++) {
-        fout << inventory[i] << "\n";
-    }
+    fout << health << " " << food << " " << distance << " " << money << " " << hasTent << " " << sticksFound << " " << inventory.size() << "\n";
+    for (const auto& item : inventory)
+        fout << item << "\n";
     fout.close();
 }
 
 void loadFromFile(const std::string& filename) {
     std::ifstream fin(filename);
-    if (!fin) {
-        cout << "No save file found. Starting new game.\n";
-        return;
-    }
+    if (!fin) { cout << "No save file found. Starting new game.\n"; return; }
+    size_t itemCount;
     fin >> health >> food >> distance >> money >> hasTent >> sticksFound >> itemCount;
-    fin.ignore(); // To skip the newline after itemCount
-    for (int i = 0; i < itemCount; i++) {
-        std::getline(fin, inventory[i]);
+    fin.ignore();
+    inventory.clear();
+    for (size_t i = 0; i < itemCount; ++i) {
+        std::string item;
+        std::getline(fin, item);
+        inventory.push_back(item);
     }
     fin.close();
 }
 };
+
+int Player::total_players=0;
 
 // ================= ACTION SYSTEM =================
 class Action {
