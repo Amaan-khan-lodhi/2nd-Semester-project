@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 
@@ -153,6 +154,29 @@ public:
         cout << "Money: " << money << endl;
         cout << "Tent: " << (hasTent ? "Yes" : "No") << endl;
     }
+
+        void saveToFile(const std::string& filename) {
+    std::ofstream fout(filename);
+    fout << health << " " << food << " " << distance << " " << money << " " << hasTent << " " << sticksFound << " " << itemCount << "\n";
+    for (int i = 0; i < itemCount; i++) {
+        fout << inventory[i] << "\n";
+    }
+    fout.close();
+}
+
+void loadFromFile(const std::string& filename) {
+    std::ifstream fin(filename);
+    if (!fin) {
+        cout << "No save file found. Starting new game.\n";
+        return;
+    }
+    fin >> health >> food >> distance >> money >> hasTent >> sticksFound >> itemCount;
+    fin.ignore(); // To skip the newline after itemCount
+    for (int i = 0; i < itemCount; i++) {
+        std::getline(fin, inventory[i]);
+    }
+    fin.close();
+}
 };
 
 // ================= ACTION SYSTEM =================
@@ -359,8 +383,8 @@ public:
 
             player.displayStats();
 
-            cout << "\n1.Travel 2.Rest 3.Hunt 4.Sell 5.Tent 6.Eat 7.Inventory 8.Exit\n";
-            cin >> choice;
+           cout << "\n1.Travel 2.Rest 3.Hunt 4.Sell 5.Tent 6.Eat 7.Inventory 8.Save 9.Load 10.Exit\n";           
+           cin >> choice;
 
         if (cin.fail()) {  
             cin.clear();
@@ -369,8 +393,8 @@ public:
         continue;
     }
 
-        if (choice < 1 || choice > 8) {
-            cout << "Choose between 1-8\n";
+        if (choice < 1 || choice > 10) {
+            cout << "Choose between 1- 10\n";
                 continue;
         }
 
@@ -392,7 +416,17 @@ public:
                 player.showInventory();
                 continue;
             }
-            else if (choice == 8)
+            else if (choice == 8) {
+            player.saveToFile("save.txt");
+            cout << "Game Saved!\n";
+            continue;
+        }
+            else if (choice == 9) {
+            player.loadFromFile("save.txt");
+            cout << "Game Loaded!\n";
+            continue;
+        }
+            else if (choice == 10)
                 break;
             else
                 continue;
