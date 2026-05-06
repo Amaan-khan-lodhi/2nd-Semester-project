@@ -18,7 +18,7 @@ private:
     bool hasTent;
     static int total_players;
 
-    vector<string> inventory;
+   std::vector<std::string> inventory;
     int sticksFound;
 
 public:
@@ -178,6 +178,15 @@ void loadFromFile(const std::string& filename) {
 int Player::total_players=0;
 
 // ================= ACTION SYSTEM =================
+
+
+//  Strategy Design Pattern is used here:                       
+//  The Game has an Action pointer, which can be set to any     
+//  subclass (Travel, Hunt, Rest, etc.). Each subclass         
+//  implements the PerformAction() method. This allows the game 
+//  to select an action (strategy) at runtime and execute it    
+//  polymorphically, decoupling Game logic from specific action 
+
 class Action {
 public:
     virtual void PerformAction(Player &p) = 0;
