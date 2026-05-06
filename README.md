@@ -1,2 +1,3 @@
-# 2nd-Semester-project
-Learning OOP and GUI for the Project 
+# Sirvival Trail Simulator 
+
+Design and Implementation of an Object-Oriented Survival Game in C++ Using Raylib
