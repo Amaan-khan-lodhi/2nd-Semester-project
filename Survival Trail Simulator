@@ -1,0 +1,419 @@
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+// ================= PLAYER =================
+class Player {
+private:
+    int food;
+    int health;
+    int distance;
+    int money;
+    bool hasTent;
+
+    string inventory[10];
+    int itemCount;
+    int sticksFound;
+
+public:
+    Player() {
+        health = 100;
+        food = 100;
+        distance = 0;
+        money = 0;
+        hasTent = false;
+        itemCount = 0;
+        sticksFound = 0;
+    }
+
+    void updateStats(int h, int f, int d) {
+        health += h;
+        food += f;
+        distance += d;
+
+        if (health > 100) health = 100;
+        if (health < 0) health = 0;
+
+        if (food > 100) food = 100;
+        if (food < 0) food = 0;
+        if (distance < 0) distance = 0;
+    }
+
+    void addMoney(int m) {
+        money += m;
+        if (money < 0) money = 0;
+    }
+
+    void buildTent() {
+        hasTent = true;
+    }
+
+    bool tentStatus() {
+        return hasTent;
+    }
+
+    int getHealth() { return health; }
+    int getFood() { return food; }
+    int getDistance() { return distance; }
+    int getMoney() { return money; }
+    int getStickCount() { return sticksFound; }
+
+    // ================= INVENTORY =================
+
+    void addItem(string item) {
+        if (itemCount < 10) {
+            inventory[itemCount] = item;
+            itemCount++;
+            cout << item << " added to inventory.\n";
+        } else {
+            cout << "Inventory full!\n";
+        }
+    }
+
+    void showInventory() {
+        cout << "\n Inventory:\n";
+
+        if (itemCount == 0) {
+            cout << "Empty\n";
+            return;
+        }
+
+        for (int i = 0; i < itemCount; i++) {
+            cout << i + 1 << ". " << inventory[i] << endl;
+        }
+    }
+
+    void useItem(int index) {
+        if (index < 0 || index >= itemCount) {
+            cout << "Invalid item!\n";
+            return;
+        }
+
+        for (int i = index; i < itemCount - 1; i++) {
+            inventory[i] = inventory[i + 1];
+        }
+
+        itemCount--;
+    }
+
+    // ================= STICK SYSTEM =================
+
+    bool hasWeapon() {
+        for (int i = 0; i < itemCount; i++) {
+            if (inventory[i] == "Stick")
+                return true;
+        }
+        return false;
+    }
+
+    void giveStick() {
+        if (sticksFound < 3) {
+            addItem("Stick");
+            sticksFound++;
+        }
+    }
+
+    void useStick() {
+        for (int i = 0; i < itemCount; i++) {
+            if (inventory[i] == "Stick") {
+                cout << "You used a Stick.\n";
+                useItem(i);
+                return;
+            }
+        }
+    }
+
+    // ================= EAT FOOD =================
+
+    void eatFood() {
+        if (food >= 10) {
+            food -= 10;
+            health += 15;
+
+            if (health > 100)
+                health = 100;
+
+            cout << "\n You ate food and gained health!\n";
+        } else {
+            cout << "\nNot enough food!\n";
+        }
+    }
+
+    // ================= DISPLAY =================
+
+    void displayStats() {
+        cout << "\n======= PLAYER STATUS =======\n";
+        cout << "Food: " << food << endl;
+        cout << "Health: " << health << endl;
+        cout << "Distance: " << distance << endl;
+        cout << "Money: " << money << endl;
+        cout << "Tent: " << (hasTent ? "Yes" : "No") << endl;
+    }
+};
+
+// ================= ACTION SYSTEM =================
+class Action {
+public:
+    virtual void PerformAction(Player &p) = 0;
+    virtual ~Action() {}
+};
+
+class Travel : public Action {
+public:
+    void PerformAction(Player &p) {
+        p.updateStats(-10, -5, 15);
+        cout << "\nYou traveled.\n";
+    }
+};
+
+class Hunt : public Action {
+public:
+    void PerformAction(Player &p) {
+        p.updateStats(-20, 20, 0);
+        cout << "\nYou hunted food.\n";
+    }
+};
+
+class Rest : public Action {
+public:
+    void PerformAction(Player &p) {
+        p.updateStats(20, 0, 0);
+        cout << "\nYou rested.\n";
+    }
+};
+
+class SellFood : public Action {
+public:
+    void PerformAction(Player &p) {
+        if (p.getFood() >= 10) {
+            p.updateStats(0, -10, 0);
+            p.addMoney(15);
+            cout << "\nFood sold.\n";
+        } else {
+            cout << "\nNot enough food.\n";
+        }
+    }
+};
+
+class BuildTent : public Action {
+public:
+    void PerformAction(Player &p) {
+        if (p.getMoney() >= 30) {
+            p.addMoney(-30);
+            p.buildTent();
+            cout << "\nTent built \n";
+        } else {
+            cout << "\nNot enough money.\n";
+        }
+    }
+};
+
+class EatFood : public Action {
+public:
+    void PerformAction(Player &p) {
+        p.eatFood();
+    }
+};
+
+// ================= GAME =================
+class Game {
+private:
+    Player player;
+    bool isRunning;
+    bool isDay;
+    int turnCount;
+
+public:
+    Game() {
+        isRunning = true;
+        isDay = true;
+        turnCount = 0;
+    }
+
+    void updateTime() {
+        turnCount++;
+
+        if (turnCount % 2 == 0) {
+            if (isDay)
+                isDay = false;
+            else
+                isDay = true;
+        }
+
+        if (isDay)
+            cout << "\n Day Time\n";
+        else
+            cout << "\n Night Time\n";
+    }
+
+    // ================= EVENTS =================
+
+    void findStickEvent() {
+        if (rand() % 100 < 20) {
+            if (player.getStickCount() < 3) {
+                player.giveStick();
+            }
+        }
+    }
+
+    void stormEvent() {
+        int chance;
+
+        if (isDay)
+            chance = rand() % 100 + 20;
+        else
+            chance = rand() % 100;
+
+        if (chance < 30) {
+            cout << "\n Storm!\n";
+
+            if (!player.tentStatus()) {
+                int damage = isDay ? 30 : 40;
+                player.updateStats(-damage, -10, -5);
+                cout << "No tent! Damage taken.\n";
+            } else {
+                player.updateStats(-5, 0, 0);
+                cout << "Tent protected you.\n";
+            }
+        }
+    }
+
+   void wolfAttackEvent() {
+    int chance;
+    
+    if (isDay)
+        chance = rand() % 100 + 25;
+    else
+        chance = rand() % 100 ;
+    
+    if (chance < 30) {
+        cout << "\n Wolf attacked!\n";
+        
+        // Check weapon FIRST
+        if (player.hasWeapon()) {
+            cout << "You used Stick to defend yourself!\n";
+            player.updateStats(-5, 0, 0);
+            player.useStick();
+            return;
+        }
+        
+    int choice;
+        do {
+            cout << "1.Fight 2.Run\nChoice: ";
+            cin >> choice;
+
+        if (cin.fail()) {  
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input!\n";
+            choice=0;
+                continue;
+        }
+
+        if (choice < 1 || choice > 2) {
+            cout << "Choose between 1-2\n";
+            continue;
+        }
+    } while (choice < 1 || choice > 2);
+
+
+        if (choice == 1) {
+            int damage = isDay ? 25 : 40;
+            player.updateStats(-damage, 0, 0);
+            cout << "You fought.\n";
+        
+} else {
+            int loss = isDay ? 10 : 20;
+            player.updateStats(-loss, -10, 0);
+            cout << "You ran away.\n";
+        
+}
+       
+    }
+}
+
+    void checkStatus() {
+        if (player.getHealth() <= 0 || player.getFood() <= 0) {
+            cout << "\n Game Over\n";
+            isRunning = false;
+        }
+
+        if (player.getDistance() >= 100) {
+            cout << "\n You Win!\n";
+            isRunning = false;
+        }
+    }
+
+    // ================= GAME LOOP =================
+
+    void startGame() {
+        int choice;
+
+        cout << "\n===== GAME STARTED =====\n";
+
+        while (isRunning) {
+
+            player.displayStats();
+
+            cout << "\n1.Travel 2.Rest 3.Hunt 4.Sell 5.Tent 6.Eat 7.Inventory 8.Exit\n";
+            cin >> choice;
+
+        if (cin.fail()) {  
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input!\n";
+        continue;
+    }
+
+        if (choice < 1 || choice > 8) {
+            cout << "Choose between 1-8\n";
+                continue;
+        }
+
+            Action *action = NULL;
+
+            if (choice == 1)
+                action = new Travel();
+            else if (choice == 2)
+                action = new Rest();
+            else if (choice == 3)
+                action = new Hunt();
+            else if (choice == 4)
+                action = new SellFood();
+            else if (choice == 5)
+                action = new BuildTent();
+            else if (choice == 6)
+                action = new EatFood();
+            else if (choice == 7) {
+                player.showInventory();
+                continue;
+            }
+            else if (choice == 8)
+                break;
+            else
+                continue;
+
+            action->PerformAction(player);
+            delete action;
+
+            updateTime();
+            findStickEvent();
+            stormEvent();
+            wolfAttackEvent();
+            checkStatus();
+        }
+    }
+};
+
+
+
+int main() {
+    srand(time(0));  // Seed random number generator
+    Game game;
+    game.startGame();
+    return 0;
+}
