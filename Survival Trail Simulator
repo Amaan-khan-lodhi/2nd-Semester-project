@@ -18,7 +18,7 @@ private:
     bool hasTent;
     static int total_players;
 
-   std::vector<std::string> inventory;
+   vector<string> inventory;
     int sticksFound;
 
 public:
