@@ -28,7 +28,6 @@ public:
         distance = 0;
         money = 0;
         hasTent = false;
-        itemCount = 0;
         sticksFound = 0;
         total_players ++;
     }
@@ -57,7 +56,7 @@ public:
         hasTent = true;
     }
 
-    bool tentStatus() {
+    bool tentStatus() const {
         return hasTent;
     }
 
@@ -100,7 +99,7 @@ void useItem(int index) {
     // ================= STICK SYSTEM =================
 
     bool hasWeapon() {
-        for (int i = 0; i < itemCount; i++) {
+        for (size_t i = 0; i < inventory.size(); i++) {
             if (inventory[i] == "Stick")
                 return true;
         }
@@ -115,7 +114,7 @@ void useItem(int index) {
     }
 
     void useStick() {
-        for (int i = 0; i < itemCount; i++) {
+     for (size_t i = 0; i < inventory.size(); i++) {
             if (inventory[i] == "Stick") {
                 cout << "You used a Stick.\n";
                 useItem(i);
