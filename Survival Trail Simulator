@@ -367,7 +367,7 @@ public:
 }
 
     void checkStatus() {
-        if (player.getHealth() <= 0 || player.getFood() <= 0) {
+        if (player.getHealth() <= 0 ) {
             cout << "\n Game Over\n";
             isRunning = false;
         }
@@ -434,8 +434,7 @@ public:
         }
             else if (choice == 10)
                 break;
-            else
-                continue;
+          
 
             action->PerformAction(player);
             delete action;
