@@ -277,7 +277,7 @@ public:
         player.updateStats(-GameConstants::TRAVEL_HEALTH_COST, 
                           -GameConstants::TRAVEL_FOOD_COST, 
                           GameConstants::TRAVEL_DISTANCE_GAIN);
-        cout << "🚶 You traveled 15 miles.\n";
+        cout << "🚶 You traveled 15 km.\n";
     }
 };
 
