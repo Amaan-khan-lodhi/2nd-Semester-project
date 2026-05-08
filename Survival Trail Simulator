@@ -54,11 +54,11 @@ namespace GameConstants {
     
     // Probabilities (0-100)
     constexpr int STICK_FIND_CHANCE = 20;
-    constexpr int STORM_BASE_CHANCE = 30;
-    constexpr int WOLF_BASE_CHANCE = 30;
-    constexpr int WOLF_DAY_CHANCE_OFFSET = 25;
+    constexpr int STORM_BASE_CHANCE = 15;
+    constexpr int WOLF_BASE_CHANCE = 20;
+    constexpr int WOLF_DAY_CHANCE_OFFSET = 20;
     constexpr int WOLF_NIGHT_CHANCE_OFFSET = 0;
-    constexpr int STORM_DAY_CHANCE_OFFSET = 20;
+    constexpr int STORM_DAY_CHANCE_OFFSET = 15;
 }
 
 // ================= RANDOM NUMBER GENERATOR =================
@@ -139,7 +139,7 @@ public:
     // ================= INVENTORY MANAGEMENT =================
     bool addItem(const string& item) {
         if (inventory.size() >= GameConstants::MAX_INVENTORY) {
-            cout << "❌ Inventory full!\n";
+            cout << " Inventory full!\n";
             return false;
         }
         inventory.push_back(item);
@@ -161,7 +161,7 @@ public:
     
     bool useItem(int index) {
         if (index < 0 || (size_t)index >= inventory.size()) {
-            cout << "❌ Invalid item!\n";
+            cout << " Invalid item!\n";
             return false;
         }
         inventory.erase(inventory.begin() + index);
@@ -185,7 +185,7 @@ public:
     bool useStick() {
         auto it = find(inventory.begin(), inventory.end(), "Stick");
         if (it != inventory.end()) {
-            cout << "⚔️ You used a Stick to defend yourself!\n";
+            cout << " You used a Stick to defend yourself!\n";
             inventory.erase(it);
             return true;
         }
@@ -195,7 +195,7 @@ public:
     // ================= FOOD CONSUMPTION =================
     bool eatFood() {
         if (food < GameConstants::FOOD_EAT_COST) {
-            cout << "❌ Not enough food!\n";
+            cout << " Not enough food!\n";
             return false;
         }
         food -= GameConstants::FOOD_EAT_COST;
@@ -203,28 +203,28 @@ public:
         if (health > GameConstants::MAX_HEALTH) {
             health = GameConstants::MAX_HEALTH;
         }
-        cout << "🍖 You ate food and gained health!\n";
+        cout << " You ate food and gained health!\n";
         return true;
     }
     
     // ================= DISPLAY =================
     void displayStats() const {
-        cout << "\n╔════════════════════════════╗\n";
-        cout << "║    PLAYER STATUS           ║\n";
-        cout << "╠════════════════════════════╣\n";
-        cout << "║ ❤️  Health:  " << health << "/100" << string(max(0, (int)(15 - to_string(health).length())), ' ') << "║\n";
-        cout << "║ 🍖 Food:    " << food << "/100" << string(max(0, (int)(15 - to_string(food).length())), ' ') << "║\n";
-        cout << "║ 📍 Distance: " << distance << "/100" << string(max(0, (int)(14 - to_string(distance).length())), ' ') << "║\n";
-        cout << "║ 💰 Money:   " << money << string(max(0, (int)(20 - to_string(money).length())), ' ') << "║\n";
-        cout << "║ ⛺ Tent:    " << (hasTent ? "Yes" : "No") << string(22, ' ') << "║\n";
-        cout << "╚════════════════════════════╝\n";
+        cout << "\n==============================\n";
+        cout << "|    PLAYER STATUS           |\n";
+        cout << "|============================|\n";
+        cout << "|  Health:  " << health << "/100" << string(max(0, (int)(13 - to_string(health).length())), ' ') << "|\n";
+        cout << "|  Food:    " << food << "/100" << string(max(0, (int)(13 - to_string(food).length())), ' ') << "|\n";
+        cout << "|  Distance: " << distance << "/100" << string(max(0, (int)(12 - to_string(distance).length())), ' ') << "|\n";
+        cout << "|  Money:   " << money << string(max(0, (int)(17 - to_string(money).length())), ' ') << "|\n";
+        cout << "|  Tent:    " << (hasTent ? "Yes" : "No") << string(15, ' ') <<"|\n";
+        cout << "==============================\n";
     }
     
     // ================= FILE I/O =================
     void saveToFile(const string& filename) const {
         ofstream fout(filename);
         if (!fout) {
-            cout << "❌ Cannot open save file!\n";
+            cout << " Cannot open save file!\n";
             return;
         }
         fout << health << " " << food << " " << distance << " " 
@@ -234,13 +234,13 @@ public:
             fout << item << "\n";
         }
         fout.close();
-        cout << "✓ Game saved successfully!\n";
+        cout << " Game saved successfully!\n";
     }
     
     void loadFromFile(const string& filename) {
         ifstream fin(filename);
         if (!fin) {
-            cout << "⚠️  No save file found. Starting new game.\n";
+            cout << "️  No save file found. Starting new game.\n";
             return;
         }
         
@@ -255,7 +255,7 @@ public:
             inventory.push_back(item);
         }
         fin.close();
-        cout << "✓ Game loaded successfully!\n";
+        cout << " Game loaded successfully!\n";
         clampValues();
     }
     
@@ -277,7 +277,7 @@ public:
         player.updateStats(-GameConstants::TRAVEL_HEALTH_COST, 
                           -GameConstants::TRAVEL_FOOD_COST, 
                           GameConstants::TRAVEL_DISTANCE_GAIN);
-        cout << "🚶 You traveled 15 km.\n";
+        cout << " You traveled 1.5 km.\n";
     }
 };
 
@@ -286,7 +286,7 @@ public:
     void execute(Player& player) override {
         player.updateStats(-GameConstants::HUNT_HEALTH_COST, 
                           GameConstants::HUNT_FOOD_GAIN, 0);
-        cout << "🏹 You hunted and found food!\n";
+        cout << " You hunted and found food!\n";
     }
 };
 
@@ -294,7 +294,7 @@ class RestAction : public Action {
 public:
     void execute(Player& player) override {
         player.updateStats(GameConstants::REST_HEALTH_GAIN, 0, 0);
-        cout << "😴 You rested and recovered health.\n";
+        cout << " You rested and recovered health.\n";
     }
 };
 
@@ -304,9 +304,9 @@ public:
         if (player.getFood() >= GameConstants::FOOD_SELL_AMOUNT) {
             player.updateStats(0, -GameConstants::FOOD_SELL_AMOUNT, 0);
             player.addMoney(GameConstants::FOOD_SELL_PRICE);
-            cout << "💵 You sold food for $15.\n";
+            cout << " You sold food for $15.\n";
         } else {
-            cout << "❌ Not enough food to sell!\n";
+            cout << " Not enough food to sell!\n";
         }
     }
 };
@@ -317,9 +317,9 @@ public:
         if (player.getMoney() >= GameConstants::TENT_COST) {
             player.addMoney(-GameConstants::TENT_COST);
             player.buildTent();
-            cout << "⛺ Tent built! You're protected from storms.\n";
+            cout << " Tent built! You're protected from storms.\n";
         } else {
-            cout << "❌ Not enough money! (Need $30)\n";
+            cout << " Not enough money! (Need $30)\n";
         }
     }
 };
@@ -360,7 +360,7 @@ public:
             }
             cin.clear();
             cin.ignore(10000, '\n');
-            cout << "❌ Invalid input! Please try again.\n";
+            cout << " Invalid input! Please try again.\n";
         }
     }
 };
@@ -378,7 +378,7 @@ private:
         if (RandomGenerator::checkProbability(GameConstants::STICK_FIND_CHANCE)) {
             if (player.getStickCount() < GameConstants::MAX_STICKS) {
                 player.giveStick();
-                cout << "🎉 You found a Stick!\n";
+                cout << " You found a Stick!\n";
             }
         }
     }
@@ -389,17 +389,17 @@ private:
             GameConstants::STORM_BASE_CHANCE;
             
         if (RandomGenerator::checkProbability(chance)) {
-            cout << "\n⛈️  A STORM APPROACHES!\n";
+            cout << "\n  A STORM APPROACHES!\n";
             
             if (!player.hasTentBuilt()) {
                 int damage = isDay ? GameConstants::STORM_DAMAGE_DAY_NO_TENT : 
                                     GameConstants::STORM_DAMAGE_NIGHT_NO_TENT;
                 player.updateStats(-damage, -GameConstants::STORM_FOOD_LOSS, 
                                  -GameConstants::STORM_DISTANCE_LOSS);
-                cout << "❌ No tent! You took " << damage << " damage!\n";
+                cout << " No tent! You took " << damage << " damage!\n";
             } else {
                 player.updateStats(-GameConstants::STORM_DAMAGE_DAY_WITH_TENT, 0, 0);
-                cout << "✓ Your tent protected you!\n";
+                cout << " Your tent protected you!\n";
             }
         }
     }
@@ -410,7 +410,7 @@ private:
             GameConstants::WOLF_BASE_CHANCE + GameConstants::WOLF_NIGHT_CHANCE_OFFSET;
             
         if (RandomGenerator::checkProbability(chance)) {
-            cout << "\n🐺 A WOLF APPEARED!\n";
+            cout << "\n A WOLF APPEARED!\n";
             
             if (player.hasWeapon()) {
                 player.updateStats(-GameConstants::WOLF_STICK_DAMAGE, 0, 0);
@@ -425,22 +425,22 @@ private:
                 int damage = isDay ? GameConstants::WOLF_DAMAGE_DAY : 
                                     GameConstants::WOLF_DAMAGE_NIGHT;
                 player.updateStats(-damage, 0, 0);
-                cout << "⚔️  You fought the wolf and took " << damage << " damage!\n";
+                cout << "  You fought the wolf and took " << damage << " damage!\n";
             } else {
                 int damage = isDay ? GameConstants::WOLF_ESCAPE_DAMAGE_DAY : 
                                    GameConstants::WOLF_ESCAPE_DAMAGE_NIGHT;
                 player.updateStats(-damage, -GameConstants::WOLF_ESCAPE_FOOD_LOSS, 0);
-                cout << "🏃 You ran away, losing health and food!\n";
+                cout << " You ran away, losing health and food!\n";
             }
         }
     }
     
     void checkGameStatus() {
         if (player.getHealth() <= 0) {
-            cout << "\n💀 GAME OVER! You died!\n";
+            cout << "\n GAME OVER! You died!\n";
             isRunning = false;
         } else if (player.getDistance() >= GameConstants::MAX_DISTANCE) {
-            cout << "\n🎉 YOU WIN! You reached the end of the trail!\n";
+            cout << "\nYOU WIN! You reached the end of the trail!\n";
             isRunning = false;
         }
     }
@@ -453,26 +453,26 @@ public:
         if (turnCount % 2 == 0) {
             isDay = !isDay;
         }
-        cout << (isDay ? "\n☀️  DAY TIME\n" : "\n🌙 NIGHT TIME\n");
+        cout << (isDay ? "\n DAY TIME\n": "\n NIGHT TIME\n");
     }
     
     void displayMenu() const {
-        cout << "\n╔═══════════════════════════════════╗\n";
-        cout << "║          CHOOSE ACTION            ║\n";
-        cout << "╠═══════════════════════════════════╣\n";
-        cout << "║ 1. Travel      2. Rest            ║\n";
-        cout << "║ 3. Hunt        4. Sell Food       ║\n";
-        cout << "║ 5. Build Tent  6. Eat Food        ║\n";
-        cout << "║ 7. Inventory   8. Save Game       ║\n";
-        cout << "║ 9. Load Game   10. Exit           ║\n";
-        cout << "╚═══════════════════════════════════╝\n";
+        cout << "\n ===================================\n";
+        cout << "|          CHOOSE ACTION            |\n";
+        cout << "|-----------------------------------|\n";
+        cout << "| 1. Travel      2. Rest            |\n";
+        cout << "| 3. Hunt        4. Sell Food       |\n";
+        cout << "| 5. Build Tent  6. Eat Food        |\n";
+        cout << "| 7. Inventory   8. Save Game       |\n";
+        cout << "| 9. Load Game   10. Exit           |\n";
+        cout << " ===================================\n";
     }
     
     void startGame() {
-        cout << "\n╔════════════════════════════════════╗\n";
-        cout << "║   SURVIVAL TRAIL SIMULATOR START   ║\n";
-        cout << "║   Reach 100 miles to escape!       ║\n";
-        cout << "╚════════════════════════════════════╝\n";
+        cout << "\n ===================================\n";
+        cout << "|   SURVIVAL TRAIL SIMULATOR START  |\n";
+        cout << "|   Reach 10.0 km   to escape!      |\n";
+        cout << " ===================================\n";
         
         while (isRunning) {
             player.displayStats();
@@ -491,7 +491,7 @@ public:
                 player.loadFromFile("save.txt");
                 continue;
             } else if (choice == 10) {
-                cout << "👋 Thanks for playing!\n";
+                cout << " Thanks for playing!\n";
                 break;
             }
             
