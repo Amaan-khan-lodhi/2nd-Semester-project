@@ -4,7 +4,7 @@ A survival game where you trek through a dangerous forest trying to reach the en
  
 ## 🎮 What's the Game About?
  
-You're lost in the forest. Your goal? Travel 100 km to escape. But it's not easy:
+You're lost in the forest. Your goal? Travel 10.0 km to escape. But it's not easy:
 - Your **health, food, and money** matter
 - **Storms** can hit you anytime (bring a tent!)
 - **Wolves** might attack at night
