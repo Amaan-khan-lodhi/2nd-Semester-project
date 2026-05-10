@@ -1,3 +1,5 @@
+// you can not Compile and run this code until you have raylib installed and integrated with your IDE so to Play the Game Download the zip file and extract it after that you can run the Game.exe file 
+
 
 #include <raylib.h>
 #include <vector>
